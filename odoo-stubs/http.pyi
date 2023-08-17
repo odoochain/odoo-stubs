@@ -104,7 +104,7 @@ class FilesystemSessionStore(sessions.FilesystemSessionStore):
     def save(self, session: Session) -> None: ...
     def get(self, sid: str) -> Session: ...
     def rotate(self, session: Session, env: Environment) -> None: ...
-    def vacuum(self) -> None: ...
+    def vacuum(self, max_lifetime=...) -> None: ...
 
 class Session(MutableMapping):
     can_save: bool
@@ -189,8 +189,9 @@ class FutureResponse:
 
 class Request:
     httprequest: werkzeug.Request
-    future_response: FutureResponse | None
+    future_response: FutureResponse
     dispatcher: Dispatcher
+    params: dict
     registry: Registry | None
     session: Session
     db: str | None
@@ -285,6 +286,7 @@ class HttpDispatcher(Dispatcher):
 class JsonRPCDispatcher(Dispatcher):
     routing_type: str
     jsonrequest: dict
+    request_id: object
     def __init__(self, request: Request) -> None: ...
     @classmethod
     def is_compatible_with(cls, request: Request) -> bool: ...
